@@ -7,23 +7,6 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class User(Base):
-    __tablename__ = 'user'
-    id = Column(Integer, primary_key=True)
-    userName = Column(String(25), nullable=False)
-    email = Column(String(411), nullable=False)
-    onlineStatus = Column(Boolean)
-
-class Favourites(Base):
-    __tablename__ = 'favourites'
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship(User)
-    favouritePlanets = Column(String(250))
-    favouriteCharacters = Column(String(250))
-    favouriteVehicles = Column(String(250))
-
-
 class Planets(Base):
     __tablename__ = 'planets'
     # Here we define columns for the table person
@@ -32,9 +15,7 @@ class Planets(Base):
     name = Column(String(250), nullable=False)
     population = Column(Integer)
     averageTemp = Column(Integer)
-    favourites_id = Column(Integer, ForeignKey('favourites.id'))
-    # favourites_planets = Column(Integer, ForeignKey('favourites.favouritePlanets'))
-    favourites = relationship(Favourites)
+    favourites = relationship('Favourites', backref='planets', lazy=True)
 
 class Characters(Base):
     __tablename__ = 'characters'
@@ -42,8 +23,8 @@ class Characters(Base):
     name = Column(String(250), nullable=False)
     race = Column(String(250), nullable=False)
     homeworld = Column(String(250), nullable=False)
-    favourites_id = Column(Integer, ForeignKey('favourites.id'))
-    favourites = relationship(Favourites)
+    favourites = relationship('Favourites', backref='characters', lazy=True)
+    
 
 class Vehicles(Base):
     __tablename__ = 'vehicles'
@@ -51,8 +32,28 @@ class Vehicles(Base):
     name = Column(String(250), nullable=False)
     length = Column(Integer)
     crewSize = Column(Integer)
-    favourites_id = Column(Integer, ForeignKey('favourites.id'))
-    favourites = relationship(Favourites)
+    favourites = relationship('Favourites', backref='vehicles', lazy=True)
+
+
+class User(Base):
+    __tablename__ = 'user'
+    id = Column(Integer, primary_key=True)
+    userName = Column(String(25), nullable=False)
+    email = Column(String(411), nullable=False)
+    onlineStatus = Column(Boolean)
+    favourites = relationship('Favourites', backref='user', lazy=True)
+
+class Favourites(Base):
+    __tablename__ = 'favourites'
+    id = Column(Integer, primary_key=True)
+    favouritePlanets_id = Column(Integer, ForeignKey('planets.id'))
+    favouriteCharacters_id = Column(Integer, ForeignKey('characters.id'))
+    favouriteVehicles_id = Column(Integer, ForeignKey('vehicles.id'))
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+
+
+    
+
 
 # class Address(Base):
 #     __tablename__ = 'address'
